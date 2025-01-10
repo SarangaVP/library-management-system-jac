@@ -31,6 +31,11 @@ edge add {
 
 #visit Librarian profile
 walker visit_librarian_profile {
+
+    obj __specs__ {
+        static has auth: bool = False;
+    }
+
     has user_name: str;
     has email: str;
 
@@ -57,6 +62,11 @@ walker visit_librarian_profile {
 
 # view all books
 walker view_all_books {
+
+    obj __specs__ {
+        static has auth: bool = False;
+    }
+
     has books:list = [];
 
     can view_all_books with `root entry{
@@ -72,6 +82,11 @@ walker view_all_books {
 
 #view all students
 walker view_all_students {
+
+    obj __specs__ {
+        static has auth: bool = False;
+    }
+
     has students:list = [];
 
     can view_all_students with `root entry{
@@ -87,6 +102,11 @@ walker view_all_students {
 
 # view all borrowings
 walker view_all_borrowings {
+
+    obj __specs__ {
+        static has auth: bool = False;
+    }
+
     has borrowings:list = [];
 
     can view_all_borrowingss with `root entry{
@@ -102,6 +122,7 @@ walker view_all_borrowings {
 
 # add new student
 walker add_student :visit_librarian_profile: {
+
     has student_name: str;
     has student_email: str;
 
@@ -121,6 +142,7 @@ walker add_student :visit_librarian_profile: {
 
 # add new book
 walker add_book :visit_librarian_profile: {
+
     has title: str;
     has author: str;
 
@@ -140,6 +162,7 @@ walker add_book :visit_librarian_profile: {
 
 # remove book
 walker remove_book :visit_librarian_profile: {
+
     has book_id: str;
 
     can remove_book with Librarian entry {
@@ -158,6 +181,7 @@ walker remove_book :visit_librarian_profile: {
 
 # remove student
 walker remove_student :visit_librarian_profile: {
+
     has student_id: str;
 
     can remove_student with Librarian entry {
@@ -177,6 +201,7 @@ walker remove_student :visit_librarian_profile: {
 
 # borrow book
 walker borrow_book :visit_librarian_profile: {
+
     has student_ref_id: str;
     has book_ref_id: str;
      
@@ -211,6 +236,7 @@ walker borrow_book :visit_librarian_profile: {
 
 # return book
 walker return_book :visit_librarian_profile: {
+
     has student_ref_id: str;
     has book_ref_id: str;
 
