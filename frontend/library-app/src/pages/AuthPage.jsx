@@ -42,47 +42,64 @@ function AuthPage({ onLogin }) {
   };
 
   return (
-    <div className="auth-page">
-      <div className="tabs">
-        <button
-          className={isLogin ? "active" : ""}
-          onClick={() => {
-            setIsLogin(true);
-            setError("");
-            setSuccess("");
-          }}
-        >
-          Login
-        </button>
-        <button
-          className={!isLogin ? "active" : ""}
-          onClick={() => {
-            setIsLogin(false);
-            setError("");
-            setSuccess("");
-          }}
-        >
-          Register
-        </button>
-      </div>
+    <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-r from-blue-500 to-indigo-600">
+      <div className="bg-white p-8 rounded-lg shadow-lg w-96">
+        {/* Tabs */}
+        <div className="flex justify-around mb-6">
+          <button
+            className={`py-2 px-4 rounded-md ${
+              isLogin ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-700"
+            }`}
+            onClick={() => {
+              setIsLogin(true);
+              setError("");
+              setSuccess("");
+            }}
+          >
+            Login
+          </button>
+          <button
+            className={`py-2 px-4 rounded-md ${
+              !isLogin ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-700"
+            }`}
+            onClick={() => {
+              setIsLogin(false);
+              setError("");
+              setSuccess("");
+            }}
+          >
+            Register
+          </button>
+        </div>
 
-      <div className="form">
-        <h2>{isLogin ? "Login" : "Register"}</h2>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button onClick={handleAuth}>{isLogin ? "Login" : "Register"}</button>
-        {error && <p className="error">{error}</p>}
-        {success && <p className="success">{success}</p>}
+        {/* Form */}
+        <div className="form">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">
+            {isLogin ? "Login" : "Register"}
+          </h2>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full p-3 mb-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full p-3 mb-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            onClick={handleAuth}
+            className="w-full py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200"
+          >
+            {isLogin ? "Login" : "Register"}
+          </button>
+          {error && <p className="text-red-500 mt-4">{error}</p>}
+          {success && <p className="text-green-500 mt-4">{success}</p>}
+        </div>
       </div>
     </div>
   );
