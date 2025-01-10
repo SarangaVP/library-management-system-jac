@@ -56,24 +56,68 @@ if st.session_state.get("logged_in"):
     st.sidebar.title("Navigation")
     menu = st.sidebar.radio("Menu", ["View Books", "View Students", "Add Student", "Add Book", "Logout"])
 
+    # if menu == "View Books":
+    #     st.header("View All Books")
+    #     headers = {"Authorization": f"Bearer {st.session_state['authToken']}"}
+    #     try:
+    #         payload = {"books": []} 
+    #         response = requests.post(f"{API_URL}/walker/view_all_books", headers=headers, json=payload)
+    #         if response.status_code == 200:
+    #             books = response.json().get("reports", [])
+    #             if books:
+    #                 st.write(books)
+    #                 # for book in books:
+    #                 #     st.write(f"**Title**: {book.get('title', 'N/A')}, **Author**: {book.get('author', 'N/A')}")
+    #             else:
+    #                 st.write("No books available.")
+    #         else:
+    #             st.error(f"Failed to fetch books. Error {response.status_code}: {response.text}")
+    #     except requests.exceptions.RequestException as e:
+    #         st.error(f"An error occurred: {e}")
+
+
     if menu == "View Books":
         st.header("View All Books")
         headers = {"Authorization": f"Bearer {st.session_state['authToken']}"}
         try:
-            payload = {"books": []} 
+            payload = {"books": []}
             response = requests.post(f"{API_URL}/walker/view_all_books", headers=headers, json=payload)
             if response.status_code == 200:
-                books = response.json().get("reports", [])
-                if books:
-                    st.write(books)
-                    # for book in books:
-                    #     st.write(f"**Title**: {book.get('title', 'N/A')}, **Author**: {book.get('author', 'N/A')}")
+                books_data = response.json().get("reports", [])
+                if books_data:
+                    for book in books_data[0][1:]:  
+                        book_id = book.get("id", "N/A")
+                        book_context = book.get("context", {})
+                        title = book_context.get("title", "N/A")
+                        author = book_context.get("author", "N/A")
+
+                        col1, col2, col3 = st.columns([3, 3, 1])
+                        with col1:
+                            st.write(f"**Title**: {title}")
+                        with col2:
+                            st.write(f"**Author**: {author}")
+                        with col3:
+                            if st.button("Remove", key=f"remove_book_{book_id}"):
+                                remove_payload = {
+                                    "book_id": book_id,
+                                    "user_name": "",
+                                    "email": "",
+                                    }
+                                remove_response = requests.post(
+                                    f"{API_URL}/walker/remove_book", headers=headers, json=remove_payload
+                                )
+                                if remove_response.status_code == 200:
+                                    st.success("Book removed successfully!")
+                                else:
+                                    st.error(f"Failed to remove book. Error {remove_response.status_code}: {remove_response.text}")
                 else:
                     st.write("No books available.")
             else:
                 st.error(f"Failed to fetch books. Error {response.status_code}: {response.text}")
         except requests.exceptions.RequestException as e:
             st.error(f"An error occurred: {e}")
+
+
 
     elif menu == "View Students":
         st.header("View All Students")
@@ -94,8 +138,8 @@ if st.session_state.get("logged_in"):
 
     elif menu == "Add Student":
         st.header("Add a New Student")
-        student_name = st.text_input("Student Name", key="add_student_name")  # Add the 'student_name' field
-        student_email = st.text_input("Student Email", key="add_student_email")  # Add the 'student_email' field
+        student_name = st.text_input("Student Name", key="add_student_name")  
+        student_email = st.text_input("Student Email", key="add_student_email")  
         if st.button("Add Student", key="add_student_button"):
             headers = {"Authorization": f"Bearer {st.session_state['authToken']}"}
             payload = {
@@ -115,8 +159,8 @@ if st.session_state.get("logged_in"):
 
     elif menu == "Add Book":
         st.header("Add a New Book")
-        title = st.text_input("Book Title", key="add_book_title")  # Add the 'title' field
-        author = st.text_input("Author", key="add_book_author")  # Add the 'author' field
+        title = st.text_input("Book Title", key="add_book_title")  
+        author = st.text_input("Author", key="add_book_author") 
         if st.button("Add Book", key="add_book_button"):
             headers = {"Authorization": f"Bearer {st.session_state['authToken']}"}
             payload = {
