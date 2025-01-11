@@ -92,6 +92,10 @@ function ViewBooks() {
             >
               <div>
                 <p>
+                  <span className="font-bold text-gray-700">ID:</span>{" "}
+                  {book.id || "N/A"}
+                </p>
+                <p>
                   <span className="font-bold text-gray-700">Title:</span>{" "}
                   {book.context?.title || "N/A"}
                 </p>

@@ -94,6 +94,10 @@ function ViewStudents() {
             >
               <div>
                 <p>
+                  <span className="font-bold text-gray-700">ID:</span>{" "}
+                  {student.id || "N/A"}
+                </p>
+                <p>
                   <span className="font-bold text-gray-700">Name:</span>{" "}
                   {student.context?.name || "N/A"}
                 </p>
