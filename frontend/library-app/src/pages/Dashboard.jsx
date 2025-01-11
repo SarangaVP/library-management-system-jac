@@ -3,6 +3,8 @@ import ViewBooks from "../components/ViewBooks.jsx";
 import ViewStudents from "../components/ViewStudents.jsx";
 import AddStudent from "../components/AddStudent.jsx";
 import AddBook from "../components/AddBook.jsx";
+import BorrowBook from "../components/BorrowBook.jsx";
+import ReturnBook from "../components/ReturnBook.jsx";  
 
 function Dashboard({ onLogout }) {
   const [menu, setMenu] = useState("View Students");
@@ -11,7 +13,7 @@ function Dashboard({ onLogout }) {
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
       <div className="w-1/5 bg-blue-500 text-white flex flex-col space-y-4 py-6 px-4">
-        {["View Books", "View Students", "Add Student", "Add Book", "Logout"].map((item) => (
+        {["View Books", "View Students", "Add Student", "Add Book", "Borrow Book", "Return Book", "Logout"].map((item) => (
           <button
             key={item}
             onClick={() => (item === "Logout" ? onLogout() : setMenu(item))}
@@ -32,6 +34,8 @@ function Dashboard({ onLogout }) {
         {menu === "View Books" && <ViewBooks />}
         {menu === "Add Student" && <AddStudent />}
         {menu === "Add Book" && <AddBook />}
+        {menu === "Borrow Book" && <BorrowBook />}
+        {menu === "Return Book" && <ReturnBook />}
       </div>
     </div>
   );
