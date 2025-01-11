@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import ViewBooks from "../components/ViewBooks.jsx";
 import ViewStudents from "../components/ViewStudents.jsx";
+import AddStudent from "../components/AddStudent.jsx";
+import AddBook from "../components/AddBook.jsx";
 
 function Dashboard({ onLogout }) {
   const [menu, setMenu] = useState("View Students");
