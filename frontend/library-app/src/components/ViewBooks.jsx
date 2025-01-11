@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { fetchBooks } from "../utils/fetchUtils";
 
 const API_URL = "http://localhost:8000";
 
@@ -8,38 +9,20 @@ function ViewBooks() {
   const [loading, setLoading] = useState(false);
   const [removing, setRemoving] = useState(false);
 
-  const fetchBooks = async () => {
+  const handleFetchBooks = async () => {
     setLoading(true);
     setError("");
     try {
-      const payload = { books: [] };
-      const response = await fetch(`${API_URL}/walker/view_all_books`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        const fetchedBooks = data.reports?.[0] || [];
-        if (fetchedBooks.length > 0) {
-          setBooks(fetchedBooks);
-        } else {
-          setBooks([]);
-          setError("No books available.");
-        }
-      } else {
-        setError("Failed to fetch books. Please try again.");
-      }
-    } catch {
-      setError("An error occurred while fetching books.");
+      const fetchedBooks = await fetchBooks();
+      setBooks(fetchedBooks);
+    } catch (err) {
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const removeBook = async (bookId) => {
+  const handleRemoveBook = async (bookId) => {
     setRemoving(true);
     setError("");
 
@@ -75,7 +58,7 @@ function ViewBooks() {
         className={`px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200 ${
           loading ? "opacity-70 cursor-not-allowed" : ""
         }`}
-        onClick={fetchBooks}
+        onClick={handleFetchBooks}
         disabled={loading}
       >
         {loading ? "Loading..." : "Fetch Books"}
@@ -105,7 +88,7 @@ function ViewBooks() {
                 </p>
               </div>
               <button
-                onClick={() => removeBook(book.id)}
+                onClick={() => handleRemoveBook(book.id)}
                 disabled={removing}
                 className={`px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-200 ${
                   removing ? "opacity-70 cursor-not-allowed" : ""

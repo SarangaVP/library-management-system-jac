@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { fetchStudents } from "../utils/fetchUtils";
 
 const API_URL = "http://localhost:8000";
 
@@ -8,38 +9,20 @@ function ViewStudents() {
   const [loading, setLoading] = useState(false);
   const [removing, setRemoving] = useState(false);
 
-  const fetchStudents = async () => {
+  const handleFetchStudents = async () => {
     setLoading(true);
     setError("");
     try {
-      const payload = { students: [] };
-      const response = await fetch(`${API_URL}/walker/view_all_students`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        const fetchedStudents = data.reports?.[0] || [];
-        if (fetchedStudents.length > 0) {
-          setStudents(fetchedStudents);
-        } else {
-          setStudents([]);
-          setError("No students available.");
-        }
-      } else {
-        setError("Failed to fetch students. Please try again.");
-      }
-    } catch {
-      setError("An error occurred while fetching students.");
+      const fetchedStudents = await fetchStudents();
+      setStudents(fetchedStudents);
+    } catch (err) {
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const removeStudent = async (studentId) => {
+  const handleRemoveStudent = async (studentId) => {
     setRemoving(true);
     setError("");
 
@@ -77,7 +60,7 @@ function ViewStudents() {
         className={`px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200 ${
           loading ? "opacity-70 cursor-not-allowed" : ""
         }`}
-        onClick={fetchStudents}
+        onClick={handleFetchStudents}
         disabled={loading}
       >
         {loading ? "Loading..." : "Fetch Students"}
@@ -107,7 +90,7 @@ function ViewStudents() {
                 </p>
               </div>
               <button
-                onClick={() => removeStudent(student.id)}
+                onClick={() => handleRemoveStudent(student.id)}
                 disabled={removing}
                 className={`px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-200 ${
                   removing ? "opacity-70 cursor-not-allowed" : ""

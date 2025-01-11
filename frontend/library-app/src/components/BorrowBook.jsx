@@ -1,28 +1,48 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { fetchBooks, fetchStudents } from "../utils/fetchUtils";
 
 const API_URL = "http://localhost:8000";
 
 function BorrowBook() {
-  const [bookId, setBookId] = useState("");
-  const [studentId, setStudentId] = useState("");
+  const [bookRefId, setBookRefId] = useState(""); 
+  const [studentRefId, setStudentRefId] = useState(""); 
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [books, setBooks] = useState([]);
+  const [students, setStudents] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const booksData = await fetchBooks();
+        const studentsData = await fetchStudents();
+        setBooks(booksData);
+        setStudents(studentsData);
+      } catch (err) {
+        setError("");
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleBorrowBook = async () => {
     setMessage("");
     setError("");
 
-    if (!bookId || !studentId) {
-      setError("Please provide both Book ID and Student ID.");
+    if (!bookRefId || !studentRefId) {
+      setError("Please select both Book and Student.");
       return;
     }
 
     setLoading(true);
 
     const payload = {
-      book_id: bookId,
-      student_id: studentId,
+      user_name: "",
+      email: "",
+      student_ref_id: studentRefId, 
+      book_ref_id: bookRefId, 
     };
 
     try {
@@ -32,13 +52,14 @@ function BorrowBook() {
         body: JSON.stringify(payload),
       });
 
-      if (response.ok) {
+      const data = await response.json();
+
+      if (response.ok && data.reports?.[0] === true) {
         setMessage("Book borrowed successfully!");
-        setBookId("");
-        setStudentId("");
+        setBookRefId("");
+        setStudentRefId("");
       } else {
-        const data = await response.json();
-        setError(`Failed to borrow book: ${data.detail || "Unknown error"}`);
+        setError("Failed to borrow book. Please check the input or try again.");
       }
     } catch (err) {
       setError("An error occurred while borrowing the book.");
@@ -50,26 +71,39 @@ function BorrowBook() {
   return (
     <div className="p-6 bg-white rounded-lg shadow-lg">
       <h2 className="text-2xl font-bold text-gray-800 mb-4">Borrow a Book</h2>
+
       <div className="mb-4">
-        <label className="block text-gray-700 mb-2">Book ID</label>
-        <input
-          type="text"
-          value={bookId}
-          onChange={(e) => setBookId(e.target.value)}
-          placeholder="Enter Book ID"
+        <label className="block text-gray-700 mb-2">Select Book</label>
+        <select
+          value={bookRefId}
+          onChange={(e) => setBookRefId(e.target.value)} 
           className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+        >
+          <option value="">Select a Book</option>
+          {books.map((book) => (
+            <option key={book.id} value={book.id}>
+              {book.context?.title || "N/A"} (ID: {book.id})
+            </option>
+          ))}
+        </select>
       </div>
+
       <div className="mb-4">
-        <label className="block text-gray-700 mb-2">Student ID</label>
-        <input
-          type="text"
-          value={studentId}
-          onChange={(e) => setStudentId(e.target.value)}
-          placeholder="Enter Student ID"
+        <label className="block text-gray-700 mb-2">Select Student</label>
+        <select
+          value={studentRefId}
+          onChange={(e) => setStudentRefId(e.target.value)} 
           className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+        >
+          <option value="">Select a Student</option>
+          {students.map((student) => (
+            <option key={student.id} value={student.id}>
+              {student.context?.name || "N/A"} (ID: {student.id})
+            </option>
+          ))}
+        </select>
       </div>
+
       <button
         onClick={handleBorrowBook}
         disabled={loading}
@@ -87,3 +121,4 @@ function BorrowBook() {
 }
 
 export default BorrowBook;
+
