@@ -6,6 +6,7 @@ function ViewStudents() {
   const [students, setStudents] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [removing, setRemoving] = useState(false);
 
   const fetchStudents = async () => {
     setLoading(true);
@@ -38,6 +39,37 @@ function ViewStudents() {
     }
   };
 
+  const removeStudent = async (studentId) => {
+    setRemoving(true);
+    setError("");
+
+    const payload = {
+      user_name: "",
+      email: "",
+      student_id: studentId,
+    };
+
+    try {
+      const response = await fetch(`${API_URL}/walker/remove_student`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        setStudents((prevStudents) =>
+          prevStudents.filter((student) => student.id !== studentId)
+        );
+      } else {
+        setError("Failed to remove the student. Please try again.");
+      }
+    } catch {
+      setError("An error occurred while removing the student.");
+    } finally {
+      setRemoving(false);
+    }
+  };
+
   return (
     <div className="p-6 bg-white rounded-lg shadow-lg">
       <h2 className="text-2xl font-bold text-gray-800 mb-4">View All Students</h2>
@@ -55,19 +87,30 @@ function ViewStudents() {
 
       {students.length > 0 && (
         <ul className="mt-6 space-y-4">
-          {students.map((student, index) => (
+          {students.map((student) => (
             <li
-              key={index}
-              className="p-4 bg-gray-100 rounded-md shadow-md border border-gray-200"
+              key={student.id}
+              className="p-4 bg-gray-100 rounded-md shadow-md border border-gray-200 flex justify-between items-center"
             >
-              <p>
-                <span className="font-bold text-gray-700">Name:</span>{" "}
-                {student.context?.name || "N/A"}
-              </p>
-              <p>
-                <span className="font-bold text-gray-700">Email:</span>{" "}
-                {student.context?.email || "N/A"}
-              </p>
+              <div>
+                <p>
+                  <span className="font-bold text-gray-700">Name:</span>{" "}
+                  {student.context?.name || "N/A"}
+                </p>
+                <p>
+                  <span className="font-bold text-gray-700">Email:</span>{" "}
+                  {student.context?.email || "N/A"}
+                </p>
+              </div>
+              <button
+                onClick={() => removeStudent(student.id)}
+                disabled={removing}
+                className={`px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-200 ${
+                  removing ? "opacity-70 cursor-not-allowed" : ""
+                }`}
+              >
+                {removing ? "Removing..." : "Remove"}
+              </button>
             </li>
           ))}
         </ul>

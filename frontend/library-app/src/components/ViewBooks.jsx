@@ -6,6 +6,7 @@ function ViewBooks() {
   const [books, setBooks] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [removing, setRemoving] = useState(false);
 
   const fetchBooks = async () => {
     setLoading(true);
@@ -29,14 +30,41 @@ function ViewBooks() {
           setError("No books available.");
         }
       } else {
-        setError(
-          `Failed to fetch books. Error ${response.status}: ${data.message || "Unknown error."}`
-        );
+        setError("Failed to fetch books. Please try again.");
       }
-    } catch (e) {
+    } catch {
       setError("An error occurred while fetching books.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const removeBook = async (bookId) => {
+    setRemoving(true);
+    setError("");
+
+    const payload = {
+      user_name: "",
+      email: "",
+      book_id: bookId,
+    };
+
+    try {
+      const response = await fetch(`${API_URL}/walker/remove_book`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        setBooks((prevBooks) => prevBooks.filter((book) => book.id !== bookId));
+      } else {
+        setError("Failed to remove the book. Please try again.");
+      }
+    } catch {
+      setError("An error occurred while removing the book.");
+    } finally {
+      setRemoving(false);
     }
   };
 
@@ -57,19 +85,30 @@ function ViewBooks() {
 
       {books.length > 0 && (
         <ul className="mt-6 space-y-4">
-          {books.map((book, index) => (
+          {books.map((book) => (
             <li
-              key={index}
-              className="p-4 bg-gray-100 rounded-md shadow-md border border-gray-200"
+              key={book.id}
+              className="p-4 bg-gray-100 rounded-md shadow-md border border-gray-200 flex justify-between items-center"
             >
-              <p>
-                <span className="font-bold text-gray-700">Title:</span>{" "}
-                {book.context?.title || "N/A"}
-              </p>
-              <p>
-                <span className="font-bold text-gray-700">Author:</span>{" "}
-                {book.context?.author || "N/A"}
-              </p>
+              <div>
+                <p>
+                  <span className="font-bold text-gray-700">Title:</span>{" "}
+                  {book.context?.title || "N/A"}
+                </p>
+                <p>
+                  <span className="font-bold text-gray-700">Author:</span>{" "}
+                  {book.context?.author || "N/A"}
+                </p>
+              </div>
+              <button
+                onClick={() => removeBook(book.id)}
+                disabled={removing}
+                className={`px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-200 ${
+                  removing ? "opacity-70 cursor-not-allowed" : ""
+                }`}
+              >
+                {removing ? "Removing..." : "Remove"}
+              </button>
             </li>
           ))}
         </ul>
@@ -79,4 +118,3 @@ function ViewBooks() {
 }
 
 export default ViewBooks;
-
